@@ -1,11 +1,28 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Category;
 
+use Zend\ServiceManager\ServiceManager;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
 class CategoryResource extends AbstractResourceListener
 {
+    /**
+     * @var \ApigilityBlog\Service\CategoryService
+     */
+    protected $categoryService;
+
+    /**
+     * @var \ApigilityUser\Service\UserService
+     */
+    protected $userService;
+
+    public function __construct(ServiceManager $services)
+    {
+        $this->categoryService = $services->get('ApigilityBlog\Service\CategoryService');
+        $this->userService = $services->get('ApigilityUser\Service\UserService');
+    }
+
     /**
      * Create a resource
      *
@@ -14,7 +31,16 @@ class CategoryResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        try {
+            $user = $this->userService->getAuthUser();
+            $parent = null;
+            if (isset($data->category_id)) {
+                $parent = $this->categoryService->getCategory($data->category_id);
+            }
+            return new CategoryEntity($this->categoryService->createCategory($data->name, $parent, $user));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -25,7 +51,12 @@ class CategoryResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+        try {
+            $user = $this->userService->getAuthUser();
+            return $this->categoryService->deleteCategory($id, $user);
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -47,7 +78,11 @@ class CategoryResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        try {
+            return new CategoryEntity($this->categoryService->getCategory($id));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -58,7 +93,11 @@ class CategoryResource extends AbstractResourceListener
      */
     public function fetchAll($params = [])
     {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+        try {
+            return new CategoryCollection($this->categoryService->getCategories($params));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**

@@ -1,11 +1,28 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Article;
 
+use Zend\ServiceManager\ServiceManager;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
 class ArticleResource extends AbstractResourceListener
 {
+    /**
+     * @var \ApigilityUser\Service\UserService
+     */
+    protected $userService;
+
+    /**
+     * @var \ApigilityBlog\Service\ArticleService
+     */
+    protected $articleService;
+
+    public function __construct(ServiceManager $services)
+    {
+        $this->articleService = $services->get('ApigilityBlog\Service\ArticleService');
+        $this->userService = $services->get('ApigilityUser\Service\UserService');
+    }
+
     /**
      * Create a resource
      *
@@ -14,7 +31,12 @@ class ArticleResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        try {
+            $user = $this->userService->getAuthUser();
+            return new ArticleEntity($this->articleService->createArticle($data, $user));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**

@@ -5,6 +5,6 @@ class ArticleResourceFactory
 {
     public function __invoke($services)
     {
-        return new ArticleResource();
+        return new ArticleResource($services);
     }
 }

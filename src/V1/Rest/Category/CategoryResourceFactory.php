@@ -5,6 +5,6 @@ class CategoryResourceFactory
 {
     public function __invoke($services)
     {
-        return new CategoryResource();
+        return new CategoryResource($services);
     }
 }
