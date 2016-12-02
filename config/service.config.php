@@ -8,7 +8,9 @@
 return [
     'service_manager' => array(
         'factories' => array(
-            'ApigilityOrder\Service\OrderService'=>'ApigilityOrder\Service\OrderServiceFactory',
+            'ApigilityBlog\Service\MediaService'=>'ApigilityBlog\Service\MediaServiceFactory',
+            'ApigilityBlog\Service\CategoryService'=>'ApigilityBlog\Service\CategoryServiceFactory',
+            'ApigilityBlog\Service\ArticleService'=>'ApigilityBlog\Service\ArticleServiceFactory',
         ),
     )
 ];

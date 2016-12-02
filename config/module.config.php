@@ -97,6 +97,7 @@ return [
             'collection_name' => 'media',
             'entity_http_methods' => [
                 0 => 'GET',
+                1 => 'DELETE',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
@@ -185,6 +186,70 @@ return [
                 'route_name' => 'apigility-blog.rest.media',
                 'route_identifier_name' => 'media_id',
                 'is_collection' => true,
+            ],
+        ],
+    ],
+    'zf-content-validation' => [
+        'ApigilityBlog\\V1\\Rest\\Media\\Controller' => [
+            'input_filter' => 'ApigilityBlog\\V1\\Rest\\Media\\Validator',
+        ],
+    ],
+    'input_filter_specs' => [
+        'ApigilityBlog\\V1\\Rest\\Media\\Validator' => [
+            0 => [
+                'required' => false,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'id',
+                'field_type' => 'int',
+            ],
+            1 => [
+                'required' => true,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'type',
+                'description' => '媒体文件类型',
+                'field_type' => 'int',
+                'error_message' => '请输入媒体文件类型',
+            ],
+            2 => [
+                'required' => false,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'title',
+                'description' => '标题',
+                'error_message' => '请输入标题',
+                'allow_empty' => true,
+                'continue_if_empty' => true,
+            ],
+            3 => [
+                'required' => true,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'uri',
+                'description' => '文件相对地址',
+                'field_type' => 'string',
+                'error_message' => '请输入文件地址',
+            ],
+        ],
+    ],
+    'zf-mvc-auth' => [
+        'authorization' => [
+            'ApigilityBlog\\V1\\Rest\\Media\\Controller' => [
+                'collection' => [
+                    'GET' => false,
+                    'POST' => true,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ],
+                'entity' => [
+                    'GET' => false,
+                    'POST' => false,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => true,
+                ],
             ],
         ],
     ],

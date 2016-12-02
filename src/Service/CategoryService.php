@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: figo-007
- * Date: 2016/12/1
- * Time: 19:43
+ * Date: 2016/12/2
+ * Time: 16:40
  */
 namespace ApigilityBlog\Service;
 
@@ -14,7 +14,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineToolPaginator;
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrinePaginatorAdapter;
 use Zend\Math\Rand;
 
-class ArticleService
+class CategoryService
 {
     protected $classMethodsHydrator;
 

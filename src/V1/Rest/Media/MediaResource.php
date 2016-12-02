@@ -3,9 +3,26 @@ namespace ApigilityBlog\V1\Rest\Media;
 
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
+use Zend\ServiceManager\ServiceManager;
 
 class MediaResource extends AbstractResourceListener
 {
+    /**
+     * @var \ApigilityBlog\Service\MediaService
+     */
+    protected $mediaService;
+
+    /**
+     * @var \ApigilityUser\Service\UserService
+     */
+    protected $userService;
+
+    public function __construct(ServiceManager $services)
+    {
+        $this->mediaService = $services->get('ApigilityBlog\Service\MediaService');
+        $this->userService = $services->get('ApigilityUser\Service\UserService');
+    }
+
     /**
      * Create a resource
      *
@@ -14,7 +31,12 @@ class MediaResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        try {
+            $user = $this->userService->getAuthUser();
+            return new MediaEntity($this->mediaService->createMedia($data, $user));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -25,7 +47,12 @@ class MediaResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+        try {
+            $user = $this->userService->getAuthUser();
+            return $this->mediaService->deleteMedia($id, $user);
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -47,7 +74,11 @@ class MediaResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        try {
+            return new MediaEntity($this->mediaService->getMedia($id));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -58,7 +89,11 @@ class MediaResource extends AbstractResourceListener
      */
     public function fetchAll($params = [])
     {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+        try {
+            return new MediaCollection($this->mediaService->getMedias($params));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**

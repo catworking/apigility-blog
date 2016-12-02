@@ -5,6 +5,6 @@ class MediaResourceFactory
 {
     public function __invoke($services)
     {
-        return new MediaResource();
+        return new MediaResource($services);
     }
 }
