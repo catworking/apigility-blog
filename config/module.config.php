@@ -4,6 +4,7 @@ return [
         'factories' => [
             \ApigilityBlog\V1\Rest\Article\ArticleResource::class => \ApigilityBlog\V1\Rest\Article\ArticleResourceFactory::class,
             \ApigilityBlog\V1\Rest\Category\CategoryResource::class => \ApigilityBlog\V1\Rest\Category\CategoryResourceFactory::class,
+            \ApigilityBlog\V1\Rest\Media\MediaResource::class => \ApigilityBlog\V1\Rest\Media\MediaResourceFactory::class,
         ],
     ],
     'router' => [
@@ -26,12 +27,22 @@ return [
                     ],
                 ],
             ],
+            'apigility-blog.rest.media' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/blog/media[/:media_id]',
+                    'defaults' => [
+                        'controller' => 'ApigilityBlog\\V1\\Rest\\Media\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'zf-versioning' => [
         'uri' => [
             0 => 'apigility-blog.rest.article',
             1 => 'apigility-blog.rest.category',
+            2 => 'apigility-blog.rest.media',
         ],
     ],
     'zf-rest' => [
@@ -79,11 +90,31 @@ return [
             'collection_class' => \ApigilityBlog\V1\Rest\Category\CategoryCollection::class,
             'service_name' => 'Category',
         ],
+        'ApigilityBlog\\V1\\Rest\\Media\\Controller' => [
+            'listener' => \ApigilityBlog\V1\Rest\Media\MediaResource::class,
+            'route_name' => 'apigility-blog.rest.media',
+            'route_identifier_name' => 'media_id',
+            'collection_name' => 'media',
+            'entity_http_methods' => [
+                0 => 'GET',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \ApigilityBlog\V1\Rest\Media\MediaEntity::class,
+            'collection_class' => \ApigilityBlog\V1\Rest\Media\MediaCollection::class,
+            'service_name' => 'Media',
+        ],
     ],
     'zf-content-negotiation' => [
         'controllers' => [
             'ApigilityBlog\\V1\\Rest\\Article\\Controller' => 'HalJson',
             'ApigilityBlog\\V1\\Rest\\Category\\Controller' => 'HalJson',
+            'ApigilityBlog\\V1\\Rest\\Media\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'ApigilityBlog\\V1\\Rest\\Article\\Controller' => [
@@ -96,6 +127,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'ApigilityBlog\\V1\\Rest\\Media\\Controller' => [
+                0 => 'application/vnd.apigility-blog.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'ApigilityBlog\\V1\\Rest\\Article\\Controller' => [
@@ -103,6 +139,10 @@ return [
                 1 => 'application/json',
             ],
             'ApigilityBlog\\V1\\Rest\\Category\\Controller' => [
+                0 => 'application/vnd.apigility-blog.v1+json',
+                1 => 'application/json',
+            ],
+            'ApigilityBlog\\V1\\Rest\\Media\\Controller' => [
                 0 => 'application/vnd.apigility-blog.v1+json',
                 1 => 'application/json',
             ],
@@ -132,6 +172,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'apigility-blog.rest.category',
                 'route_identifier_name' => 'category_id',
+                'is_collection' => true,
+            ],
+            \ApigilityBlog\V1\Rest\Media\MediaEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'apigility-blog.rest.media',
+                'route_identifier_name' => 'media_id',
+                'hydrator' => \Zend\Hydrator\ClassMethods::class,
+            ],
+            \ApigilityBlog\V1\Rest\Media\MediaCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'apigility-blog.rest.media',
+                'route_identifier_name' => 'media_id',
                 'is_collection' => true,
             ],
         ],
