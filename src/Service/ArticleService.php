@@ -54,6 +54,7 @@ class ArticleService
     {
         $article = new DoctrineEntity\Article();
         $article->setTitle($data->title);
+        $article->setSummary($data->summary);
         $article->setContent($data->content);
         $article->setCreateTime(new \DateTime());
 

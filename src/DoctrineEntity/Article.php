@@ -42,6 +42,13 @@ class Article
     protected $title;
 
     /**
+     * 文章简介
+     *
+     * @Column(type="string", length=800, nullable=true)
+     */
+    protected $summary;
+
+    /**
      * @Column(type="text", nullable=true)
      */
     protected $content;
@@ -102,6 +109,17 @@ class Article
     public function getTitle()
     {
         return $this->title;
+    }
+
+    public function setSummary($summary)
+    {
+        $this->summary = $summary;
+        return $this;
+    }
+
+    public function getSummary()
+    {
+        return $this->summary;
     }
 
     public function setContent($content)
