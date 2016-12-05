@@ -61,7 +61,9 @@ return [
                 0 => 'GET',
                 1 => 'POST',
             ],
-            'collection_query_whitelist' => [],
+            'collection_query_whitelist' => [
+                0 => 'category_id',
+            ],
             'page_size' => 25,
             'page_size_param' => null,
             'entity_class' => \ApigilityBlog\V1\Rest\Article\ArticleEntity::class,

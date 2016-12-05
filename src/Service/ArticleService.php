@@ -86,4 +86,32 @@ class ArticleService
 
         return $article;
     }
+
+    public function getArticle($article_id)
+    {
+        $article = $this->em->find('ApigilityBlog\DoctrineEntity\Article', $article_id);
+        if (empty($article)) throw new \Exception('文章不存在', 404);
+        else return $article;
+    }
+
+    public function getArticles($params)
+    {
+        $qb = new QueryBuilder($this->em);
+        $qb->select('a')->from('ApigilityBlog\DoctrineEntity\Article', 'a');
+
+        $where = null;
+        if (isset($params->category_id)) {
+            $qb->innerJoin('a.categories', 'c');
+            if (!empty($where)) $where .= ' AND ';
+            $where = 'c.id = :category_id';
+        }
+
+        if (!empty($where)) {
+            $qb->where($where);
+            if (isset($params->category_id)) $qb->setParameter('category_id', $params->category_id);
+        }
+
+        $doctrine_paginator = new DoctrineToolPaginator($qb->getQuery());
+        return new DoctrinePaginatorAdapter($doctrine_paginator);
+    }
 }
