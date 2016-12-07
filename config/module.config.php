@@ -54,8 +54,7 @@ return [
             'entity_http_methods' => [
                 0 => 'GET',
                 1 => 'PATCH',
-                2 => 'PUT',
-                3 => 'DELETE',
+                2 => 'DELETE',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
@@ -63,6 +62,7 @@ return [
             ],
             'collection_query_whitelist' => [
                 0 => 'category_id',
+                1 => 'user_id',
             ],
             'page_size' => 25,
             'page_size_param' => null,
@@ -321,6 +321,17 @@ return [
                 'continue_if_empty' => true,
                 'error_message' => '请指定文章的分类',
             ],
+            5 => [
+                'required' => false,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'summary',
+                'description' => '文章简介',
+                'field_type' => 'string',
+                'allow_empty' => true,
+                'continue_if_empty' => true,
+                'error_message' => '请输入文章简介',
+            ],
         ],
     ],
     'zf-mvc-auth' => [
@@ -338,6 +349,22 @@ return [
                     'POST' => false,
                     'PUT' => false,
                     'PATCH' => false,
+                    'DELETE' => true,
+                ],
+            ],
+            'ApigilityBlog\\V1\\Rest\\Article\\Controller' => [
+                'collection' => [
+                    'GET' => false,
+                    'POST' => true,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ],
+                'entity' => [
+                    'GET' => false,
+                    'POST' => false,
+                    'PUT' => false,
+                    'PATCH' => true,
                     'DELETE' => true,
                 ],
             ],

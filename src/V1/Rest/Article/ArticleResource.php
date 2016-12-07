@@ -1,16 +1,21 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Article;
 
+use ApigilityCatworkFoundation\Base\ApigilityResource;
 use Zend\ServiceManager\ServiceManager;
 use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\AbstractResourceListener;
 
-class ArticleResource extends AbstractResourceListener
+class ArticleResource extends ApigilityResource
 {
     /**
      * @var \ApigilityUser\Service\UserService
      */
     protected $userService;
+
+    /**
+     * @var \ApigilityUser\Service\IdentityService
+     */
+    protected $identityService;
 
     /**
      * @var \ApigilityBlog\Service\ArticleService
@@ -19,8 +24,10 @@ class ArticleResource extends AbstractResourceListener
 
     public function __construct(ServiceManager $services)
     {
+        parent::__construct($services);
         $this->articleService = $services->get('ApigilityBlog\Service\ArticleService');
         $this->userService = $services->get('ApigilityUser\Service\UserService');
+        $this->identityService = $services->get('ApigilityUser\Service\IdentityService');
     }
 
     /**
@@ -40,6 +47,24 @@ class ArticleResource extends AbstractResourceListener
     }
 
     /**
+     * 更新一个
+     *
+     * @param mixed $id
+     * @param mixed $data
+     * @return ArticleEntity|ApiProblem
+     */
+    public function patch($id, $data)
+    {
+        try {
+            $auth_user = $this->userService->getAuthUser();
+            $identity = $this->identityService->getIdentity($auth_user->getId());
+            return new ArticleEntity($this->articleService->updateArticle($id, $data, $identity));
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
+    }
+
+    /**
      * Delete a resource
      *
      * @param  mixed $id
@@ -47,18 +72,13 @@ class ArticleResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
-    }
-
-    /**
-     * Delete a collection, or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function deleteList($data)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for collections');
+        try {
+            $auth_user = $this->userService->getAuthUser();
+            $identity = $this->identityService->getIdentity($auth_user->getId());
+            return $this->articleService->deleteArticle($id, $identity);
+        } catch (\Exception $exception) {
+            return new ApiProblem($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -89,51 +109,5 @@ class ArticleResource extends AbstractResourceListener
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
-    }
-
-    /**
-     * Patch (partial in-place update) a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function patch($id, $data)
-    {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
-    }
-
-    /**
-     * Patch (partial in-place update) a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function patchList($data)
-    {
-        return new ApiProblem(405, 'The PATCH method has not been defined for collections');
-    }
-
-    /**
-     * Replace a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function replaceList($data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for collections');
-    }
-
-    /**
-     * Update a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function update($id, $data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }

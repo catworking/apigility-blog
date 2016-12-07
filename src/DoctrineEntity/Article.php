@@ -144,6 +144,12 @@ class Article
         return $this->medias;
     }
 
+    public function emptyMedias()
+    {
+        $this->medias = new ArrayCollection();
+        return $this;
+    }
+
     public function addCategory($category)
     {
         $this->categories[] = $category;
@@ -172,6 +178,9 @@ class Article
         return $this;
     }
 
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;

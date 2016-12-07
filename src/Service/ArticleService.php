@@ -7,6 +7,7 @@
  */
 namespace ApigilityBlog\Service;
 
+use ApigilityUser\DoctrineEntity\Identity;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Hydrator\ClassMethods as ClassMethodsHydrator;
 use Doctrine\ORM\QueryBuilder;
@@ -87,6 +88,11 @@ class ArticleService
         return $article;
     }
 
+    /**
+     * @param $article_id
+     * @return \ApigilityBlog\DoctrineEntity\Article
+     * @throws \Exception
+     */
     public function getArticle($article_id)
     {
         $article = $this->em->find('ApigilityBlog\DoctrineEntity\Article', $article_id);
@@ -94,24 +100,92 @@ class ArticleService
         else return $article;
     }
 
+    /**
+     * @param $params
+     * @return DoctrinePaginatorAdapter
+     */
     public function getArticles($params)
     {
         $qb = new QueryBuilder($this->em);
         $qb->select('a')->from('ApigilityBlog\DoctrineEntity\Article', 'a');
 
-        $where = null;
+        $where = '';
         if (isset($params->category_id)) {
             $qb->innerJoin('a.categories', 'c');
             if (!empty($where)) $where .= ' AND ';
-            $where = 'c.id = :category_id';
+            $where .= 'c.id = :category_id';
+        }
+
+        if (isset($params->user_id)) {
+            $qb->innerJoin('a.user', 'user');
+            if (!empty($where)) $where .= ' AND ';
+            $where .= 'user.id = :user_id';
         }
 
         if (!empty($where)) {
             $qb->where($where);
             if (isset($params->category_id)) $qb->setParameter('category_id', $params->category_id);
+            if (isset($params->user_id)) $qb->setParameter('user_id', $params->user_id);
         }
 
         $doctrine_paginator = new DoctrineToolPaginator($qb->getQuery());
         return new DoctrinePaginatorAdapter($doctrine_paginator);
+    }
+
+    /**
+     * 修改文章
+     *
+     * @param $article_id
+     * @param $data
+     * @param Identity $identity
+     * @return DoctrineEntity\Article
+     * @throws \Exception
+     */
+    public function updateArticle($article_id, $data, Identity $identity)
+    {
+        $article = $this->getArticle($article_id);
+
+        if ($article->getUser()->getId() === $identity->getId()) {
+            if (isset($data->title)) $article->setTitle($data->title);
+            if (isset($data->summary)) $article->setSummary($data->summary);
+            if (isset($data->content)) $article->setContent($data->content);
+            if (isset($data->medias)) {
+                // 先清空原有媒体
+                $article->emptyMedias();
+                $media_ids = explode(',', $data->medias);
+                if (!empty($media_ids)) {
+                    foreach ($media_ids as $media_id) {
+                        $article->addMedia($this->mediaService->getMedia($media_id));
+                    }
+                }
+            }
+            $this->em->flush();
+        } else {
+            throw new \Exception('没有修改此文章的权限', 403);
+        }
+
+        return $article;
+    }
+
+    /**
+     * 删除一篇文章
+     *
+     * @param $article_id
+     * @param Identity $identity
+     * @return bool
+     * @throws \Exception
+     */
+    public function deleteArticle($article_id, Identity $identity)
+    {
+        $article = $this->getArticle($article_id);
+
+        if ($article->getUser()->getId() === $identity->getId()) {
+            $this->em->remove($article);
+            $this->em->flush();
+        } else {
+            throw new \Exception('没有删除此文章的权限', 403);
+        }
+
+        return true;
     }
 }
