@@ -2,11 +2,12 @@
 namespace ApigilityBlog\V1\Rest\Category;
 
 use ApigilityBlog\DoctrineEntity\Category;
+use ApigilityCatworkFoundation\Base\ApigilityObjectStorageAwareEntity;
 use ApigilityUser\DoctrineEntity\User;
 use ApigilityUser\V1\Rest\User\UserEntity;
 use Zend\Hydrator\ClassMethods as ClassMethodsHydrator;
 
-class CategoryEntity
+class CategoryEntity extends ApigilityObjectStorageAwareEntity
 {
     /**
      * @Id @Column(type="integer")
@@ -40,14 +41,6 @@ class CategoryEntity
      */
     protected $user;
 
-    private $hy;
-
-    public function __construct(\ApigilityBlog\DoctrineEntity\Category $category)
-    {
-        $this->hy = new ClassMethodsHydrator();
-        $this->hy->hydrate($this->hy->extract($category), $this);
-    }
-
     public function setId($id)
     {
         $this->id = $id;
@@ -78,7 +71,7 @@ class CategoryEntity
 
     public function getParent()
     {
-        if ($this->parent instanceof Category) return $this->hy->extract(new CategoryEntity($this->parent));
+        if ($this->parent instanceof Category) return $this->hydrator->extract(new CategoryEntity($this->parent, $this->serviceManager));
         else return $this->parent;
     }
 
@@ -90,7 +83,7 @@ class CategoryEntity
 
     public function getUser()
     {
-        if ($this->user instanceof User) return $this->hy->extract(new UserEntity($this->user));
+        if ($this->user instanceof User) return $this->hydrator->extract(new UserEntity($this->user, $this->serviceManager));
         else return $this->user;
     }
 }

@@ -1,19 +1,9 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Article;
 
-use Zend\Paginator\Paginator;
-use Zend\Stdlib\ArrayObject as ZendArrayObject;
+use ApigilityCatworkFoundation\Base\ApigilityObjectStorageAwareCollection;
 
-class ArticleCollection extends Paginator
+class ArticleCollection extends ApigilityObjectStorageAwareCollection
 {
-    public function getCurrentItems()
-    {
-        $set = parent::getCurrentItems();
-        $collection = new ZendArrayObject();
-
-        foreach ($set as $item) {
-            $collection->append(new ArticleEntity($item));
-        }
-        return $collection;
-    }
+    protected $itemType = ArticleEntity::class;
 }

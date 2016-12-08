@@ -40,7 +40,7 @@ class ArticleResource extends ApigilityResource
     {
         try {
             $user = $this->userService->getAuthUser();
-            return new ArticleEntity($this->articleService->createArticle($data, $user));
+            return new ArticleEntity($this->articleService->createArticle($data, $user), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
@@ -58,7 +58,7 @@ class ArticleResource extends ApigilityResource
         try {
             $auth_user = $this->userService->getAuthUser();
             $identity = $this->identityService->getIdentity($auth_user->getId());
-            return new ArticleEntity($this->articleService->updateArticle($id, $data, $identity));
+            return new ArticleEntity($this->articleService->updateArticle($id, $data, $identity), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
@@ -90,7 +90,7 @@ class ArticleResource extends ApigilityResource
     public function fetch($id)
     {
         try {
-            return new ArticleEntity($this->articleService->getArticle($id));
+            return new ArticleEntity($this->articleService->getArticle($id), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
@@ -105,7 +105,7 @@ class ArticleResource extends ApigilityResource
     public function fetchAll($params = [])
     {
         try {
-            return new ArticleCollection($this->articleService->getArticles($params));
+            return new ArticleCollection($this->articleService->getArticles($params), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }

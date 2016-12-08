@@ -3,11 +3,12 @@ namespace ApigilityBlog\V1\Rest\Article;
 
 use ApigilityBlog\V1\Rest\Category\CategoryEntity;
 use ApigilityBlog\V1\Rest\Media\MediaEntity;
+use ApigilityCatworkFoundation\Base\ApigilityObjectStorageAwareEntity;
 use ApigilityUser\DoctrineEntity\User;
 use ApigilityUser\V1\Rest\User\UserEntity;
 use Zend\Hydrator\ClassMethods as ClassMethodsHydrator;
 
-class ArticleEntity
+class ArticleEntity extends ApigilityObjectStorageAwareEntity
 {
     /**
      * @Id @Column(type="integer")
@@ -65,14 +66,6 @@ class ArticleEntity
      */
     protected $user;
 
-    private $hy;
-
-    public function __construct(\ApigilityBlog\DoctrineEntity\Article $article)
-    {
-        $this->hy = new ClassMethodsHydrator();
-        $this->hy->hydrate($this->hy->extract($article), $this);
-    }
-
     public function setId($id)
     {
         $this->id = $id;
@@ -124,12 +117,7 @@ class ArticleEntity
 
     public function getMedias()
     {
-        $data = array();
-        foreach ($this->medias as $media) {
-            $data[] = $this->hy->extract(new MediaEntity($media));
-        }
-
-        return $data;
+        return $this->getJsonValueFromDoctrineCollection($this->medias, MediaEntity::class, $this->serviceManager);
     }
 
     public function setCategories($categories)
@@ -139,12 +127,7 @@ class ArticleEntity
 
     public function getCategories()
     {
-        $data = array();
-        foreach ($this->categories as $category) {
-            $data[] = $this->hy->extract(new CategoryEntity($category));
-        }
-
-        return $data;
+        return $this->getJsonValueFromDoctrineCollection($this->categories, CategoryEntity::class, $this->serviceManager);
     }
 
     public function setCreateTime(\DateTime $create_time)
@@ -166,7 +149,7 @@ class ArticleEntity
 
     public function getUser()
     {
-        if ($this->user instanceof User) return $this->hy->extract(new UserEntity($this->user));
+        if ($this->user instanceof User) return $this->hydrator->extract(new UserEntity($this->user, $this->serviceManager));
         else return $this->user;
     }
 }

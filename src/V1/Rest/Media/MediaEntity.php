@@ -1,9 +1,9 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Media;
 
-use Zend\Hydrator\ClassMethods as ClassMethodsHydrator;
+use ApigilityCatworkFoundation\Base\ApigilityObjectStorageAwareEntity;
 
-class MediaEntity
+class MediaEntity extends ApigilityObjectStorageAwareEntity
 {
     /**
      * @Id @Column(type="integer")
@@ -34,14 +34,6 @@ class MediaEntity
      * @Column(type="datetime", nullable=false)
      */
     protected $create_time;
-
-    private $hy;
-
-    public function __construct(\ApigilityBlog\DoctrineEntity\Media $media)
-    {
-        $this->hy = new ClassMethodsHydrator();
-        $this->hy->hydrate($this->hy->extract($media), $this);
-    }
 
 
     public function setId($id)
@@ -85,7 +77,7 @@ class MediaEntity
 
     public function getUri()
     {
-        return $this->uri;
+        return $this->renderUriToUrl($this->uri);
     }
 
     public function setCreateTime(\DateTime $create_time)

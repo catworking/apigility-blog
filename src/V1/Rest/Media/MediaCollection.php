@@ -1,19 +1,9 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Media;
 
-use Zend\Paginator\Paginator;
-use Zend\Stdlib\ArrayObject as ZendArrayObject;
+use ApigilityCatworkFoundation\Base\ApigilityObjectStorageAwareCollection;
 
-class MediaCollection extends Paginator
+class MediaCollection extends ApigilityObjectStorageAwareCollection
 {
-    public function getCurrentItems()
-    {
-        $set = parent::getCurrentItems();
-        $collection = new ZendArrayObject();
-
-        foreach ($set as $item) {
-            $collection->append(new MediaEntity($item));
-        }
-        return $collection;
-    }
+    protected $itemType = MediaEntity::class;
 }

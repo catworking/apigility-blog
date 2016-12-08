@@ -1,11 +1,11 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Media;
 
+use ApigilityCatworkFoundation\Base\ApigilityResource;
 use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\AbstractResourceListener;
 use Zend\ServiceManager\ServiceManager;
 
-class MediaResource extends AbstractResourceListener
+class MediaResource extends ApigilityResource
 {
     /**
      * @var \ApigilityBlog\Service\MediaService
@@ -19,6 +19,7 @@ class MediaResource extends AbstractResourceListener
 
     public function __construct(ServiceManager $services)
     {
+        parent::__construct($services);
         $this->mediaService = $services->get('ApigilityBlog\Service\MediaService');
         $this->userService = $services->get('ApigilityUser\Service\UserService');
     }
@@ -33,7 +34,7 @@ class MediaResource extends AbstractResourceListener
     {
         try {
             $user = $this->userService->getAuthUser();
-            return new MediaEntity($this->mediaService->createMedia($data, $user));
+            return new MediaEntity($this->mediaService->createMedia($data, $user), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
@@ -56,17 +57,6 @@ class MediaResource extends AbstractResourceListener
     }
 
     /**
-     * Delete a collection, or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function deleteList($data)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for collections');
-    }
-
-    /**
      * Fetch a resource
      *
      * @param  mixed $id
@@ -75,7 +65,7 @@ class MediaResource extends AbstractResourceListener
     public function fetch($id)
     {
         try {
-            return new MediaEntity($this->mediaService->getMedia($id));
+            return new MediaEntity($this->mediaService->getMedia($id), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
@@ -90,55 +80,9 @@ class MediaResource extends AbstractResourceListener
     public function fetchAll($params = [])
     {
         try {
-            return new MediaCollection($this->mediaService->getMedias($params));
+            return new MediaCollection($this->mediaService->getMedias($params), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
-    }
-
-    /**
-     * Patch (partial in-place update) a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function patch($id, $data)
-    {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
-    }
-
-    /**
-     * Patch (partial in-place update) a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function patchList($data)
-    {
-        return new ApiProblem(405, 'The PATCH method has not been defined for collections');
-    }
-
-    /**
-     * Replace a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function replaceList($data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for collections');
-    }
-
-    /**
-     * Update a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function update($id, $data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }

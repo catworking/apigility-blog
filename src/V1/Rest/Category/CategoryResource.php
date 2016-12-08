@@ -1,11 +1,11 @@
 <?php
 namespace ApigilityBlog\V1\Rest\Category;
 
+use ApigilityCatworkFoundation\Base\ApigilityResource;
 use Zend\ServiceManager\ServiceManager;
 use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\AbstractResourceListener;
 
-class CategoryResource extends AbstractResourceListener
+class CategoryResource extends ApigilityResource
 {
     /**
      * @var \ApigilityBlog\Service\CategoryService
@@ -19,6 +19,7 @@ class CategoryResource extends AbstractResourceListener
 
     public function __construct(ServiceManager $services)
     {
+        parent::__construct($services);
         $this->categoryService = $services->get('ApigilityBlog\Service\CategoryService');
         $this->userService = $services->get('ApigilityUser\Service\UserService');
     }
@@ -37,7 +38,7 @@ class CategoryResource extends AbstractResourceListener
             if (isset($data->category_id)) {
                 $parent = $this->categoryService->getCategory($data->category_id);
             }
-            return new CategoryEntity($this->categoryService->createCategory($data->name, $parent, $user));
+            return new CategoryEntity($this->categoryService->createCategory($data->name, $parent, $user), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
@@ -60,17 +61,6 @@ class CategoryResource extends AbstractResourceListener
     }
 
     /**
-     * Delete a collection, or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function deleteList($data)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for collections');
-    }
-
-    /**
      * Fetch a resource
      *
      * @param  mixed $id
@@ -79,7 +69,7 @@ class CategoryResource extends AbstractResourceListener
     public function fetch($id)
     {
         try {
-            return new CategoryEntity($this->categoryService->getCategory($id));
+            return new CategoryEntity($this->categoryService->getCategory($id), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
@@ -94,55 +84,9 @@ class CategoryResource extends AbstractResourceListener
     public function fetchAll($params = [])
     {
         try {
-            return new CategoryCollection($this->categoryService->getCategories($params));
+            return new CategoryCollection($this->categoryService->getCategories($params), $this->serviceManager);
         } catch (\Exception $exception) {
             return new ApiProblem($exception->getCode(), $exception->getMessage());
         }
-    }
-
-    /**
-     * Patch (partial in-place update) a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function patch($id, $data)
-    {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
-    }
-
-    /**
-     * Patch (partial in-place update) a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function patchList($data)
-    {
-        return new ApiProblem(405, 'The PATCH method has not been defined for collections');
-    }
-
-    /**
-     * Replace a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function replaceList($data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for collections');
-    }
-
-    /**
-     * Update a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function update($id, $data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }
