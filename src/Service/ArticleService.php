@@ -54,9 +54,9 @@ class ArticleService
     public function createArticle($data, $user, $medias = [])
     {
         $article = new DoctrineEntity\Article();
-        $article->setTitle($data->title);
-        $article->setSummary($data->summary);
-        $article->setContent($data->content);
+        if (isset($data->title)) $article->setTitle($data->title);
+        if (isset($data->summary)) $article->setSummary($data->summary);
+        if (isset($data->content)) $article->setContent($data->content);
         $article->setCreateTime(new \DateTime());
 
         if (isset($data->category_id)) {
