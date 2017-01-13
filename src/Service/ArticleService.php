@@ -64,7 +64,7 @@ class ArticleService
             $article->addCategory($category);
         }
 
-        if (isset($data->medias)) {
+        if (isset($data->medias) && !empty($data->medias)) {
             $ids = explode(',', $data->medias);
             if (count($ids) > 0) {
                 foreach ($ids as $id) {
@@ -152,10 +152,13 @@ class ArticleService
             if (isset($data->medias)) {
                 // 先清空原有媒体
                 $article->emptyMedias();
-                $media_ids = explode(',', $data->medias);
-                if (!empty($media_ids)) {
-                    foreach ($media_ids as $media_id) {
-                        $article->addMedia($this->mediaService->getMedia($media_id));
+
+                if (!empty($data->medias)) {
+                    $media_ids = explode(',', $data->medias);
+                    if (!empty($media_ids)) {
+                        foreach ($media_ids as $media_id) {
+                            $article->addMedia($this->mediaService->getMedia($media_id));
+                        }
                     }
                 }
             }
